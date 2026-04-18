@@ -1,0 +1,70 @@
+{
+  "threat_class": "LATERAL_MOVEMENT",
+  "mitre_id": "T1021.002",
+  "title": "Lateral Movement / Internal Reconnaissance Response",
+  "steps": [
+    {
+      "phase": "Contain",
+      "step": 1,
+      "action": "Isolate compromised host from internal network",
+      "command": "iptables -A FORWARD -s {src_ip} -j DROP && iptables -A FORWARD -d {src_ip} -j DROP",
+      "description": "Stop the compromised host from pivoting further through the network."
+    },
+    {
+      "phase": "Contain",
+      "step": 2,
+      "action": "Block scan traffic to sensitive ports",
+      "command": "iptables -A INPUT -p tcp --dport 445 -j DROP && iptables -A INPUT -p tcp --dport 3389 -j DROP",
+      "description": "Block SMB and RDP access to prevent further compromise attempts."
+    },
+    {
+      "phase": "Investigate",
+      "step": 3,
+      "action": "Identify compromised account on source host",
+      "command": "last -a | grep {src_ip} | head -20",
+      "description": "Identify which user account is being used for lateral movement."
+    },
+    {
+      "phase": "Investigate",
+      "step": 4,
+      "action": "Review process execution on source host",
+      "command": "ausearch -k discovery --start recent | aureport -x --summary",
+      "description": "Review auditd records for discovery commands (whoami, net, ipconfig)."
+    },
+    {
+      "phase": "Investigate",
+      "step": 5,
+      "action": "Check for scheduled tasks or persistence mechanisms",
+      "command": "crontab -l && ls /etc/cron.d/ && systemctl list-units --type=service",
+      "description": "Look for persistence mechanisms installed by the attacker."
+    },
+    {
+      "phase": "Investigate",
+      "step": 6,
+      "action": "Enumerate network connections from compromised host",
+      "command": "ss -tulpn && netstat -an | grep ESTABLISHED",
+      "description": "Map all active connections to understand lateral movement scope."
+    },
+    {
+      "phase": "Eradicate",
+      "step": 7,
+      "action": "Kill suspicious processes on compromised host",
+      "command": "kill -9 {pid}",
+      "description": "Terminate any malicious processes identified during investigation."
+    },
+    {
+      "phase": "Eradicate",
+      "step": 8,
+      "action": "Remove any dropped payloads or scripts",
+      "command": "find / -newer /tmp -name '*.sh' -o -name '*.py' 2>/dev/null | xargs ls -la",
+      "description": "Locate and remove any attacker-dropped tools or scripts."
+    },
+    {
+      "phase": "Report",
+      "step": 9,
+      "action": "Document incident with MITRE T1021.002 + T1046 mapping",
+      "command": "echo 'INCIDENT: T1021.002+T1046 | src={src_ip} | time={timestamp}' >> /var/log/intelli-soc/incidents.log",
+      "description": "File incident report including full network scan scope and pivot path."
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+# intelli-SOC auditd rules — Endpoint Monitoring
+# Captures process execution, file access, and network activity
+
+# Delete all existing rules
+-D
+
+# Set buffer size
+-b 8192
+
+# Failure mode: 1 = silent
+-f 1
+
+# ── Process Execution ────────────────────────────────────────────
+# Monitor all execve() calls (process execution)
+-a always,exit -F arch=b64 -S execve -k exec_monitor
+-a always,exit -F arch=b32 -S execve -k exec_monitor
+
+# ── Sensitive File Access ────────────────────────────────────────
+-w /etc/passwd        -p rwxa -k sensitive_file
+-w /etc/shadow        -p rwxa -k sensitive_file
+-w /etc/sudoers       -p rwxa -k sensitive_file
+-w /root/.ssh/        -p rwxa -k ssh_access
+-w /home/             -p rwxa -k home_access
+
+# ── Network Config Changes ───────────────────────────────────────
+-w /etc/hosts         -p rwxa -k network_config
+-w /etc/network/      -p rwxa -k network_config
+
+# ── Privilege Escalation ─────────────────────────────────────────
+-a always,exit -F arch=b64 -S setuid -k priv_esc
+-a always,exit -F arch=b64 -S setgid -k priv_esc
+-w /usr/bin/sudo      -p x    -k sudo_exec
+-w /bin/su            -p x    -k su_exec
+
+# ── Lateral Movement Indicators ──────────────────────────────────
+-w /usr/bin/whoami    -p x    -k discovery
+-w /bin/net           -p x    -k discovery
+-w /usr/bin/id        -p x    -k discovery
+-w /bin/hostname      -p x    -k discovery
+-w /usr/bin/netstat   -p x    -k discovery
+-w /usr/bin/ss        -p x    -k discovery
+-w /usr/bin/nmap      -p x    -k port_scan
+-w /usr/bin/nc        -p x    -k netcat
+
+# ── Cron / Persistence ───────────────────────────────────────────
+-w /var/spool/cron    -p rwxa -k persistence
+-w /etc/cron.d/       -p rwxa -k persistence
+-w /etc/crontab       -p rwxa -k persistence
+-w /etc/rc.local      -p rwxa -k persistence
+
+# Make rules immutable (comment out during dev/testing)
+# -e 2

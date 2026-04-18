@@ -1,0 +1,40 @@
+# intelli-SOC — intelli-SOC
+
+# Dataset files (large)
+ml_training/data/raw/
+ml_training/data/processed/
+ml_training/data/models/
+ml_training/data/evaluation/
+
+# Model artifacts (generated, not committed)
+user/agent/inference/models/*.pkl
+user/agent/inference/models/*.json
+!user/agent/inference/models/.gitkeep
+
+# Logs
+logs/
+*.log
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+
+# Node / React
+dashboard/node_modules/
+dashboard/build/
+
+# Environment
+.env.local
+.env.production
+
+# Misc
+.DS_Store
+*.swp

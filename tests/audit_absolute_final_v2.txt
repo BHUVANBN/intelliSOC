@@ -1,0 +1,14 @@
+2026-04-18 02:34:16,292 [INFO] ═══ Starting Hybrid Detection Accuracy Audit ═══
+2026-04-18 02:34:16,293 [INFO] 
+--- Testing: Brute Force ---
+2026-04-18 02:34:16,298 [INFO] ▶️  Triggering attack: brute_force.py
+2026-04-18 02:34:57,559 [INFO] ⌛ Waiting 40s for processing...
+2026-04-18 02:35:37,565 [INFO] Result: FAIL (Missed/Misclassified)
+2026-04-18 02:35:37,565 [INFO] 
+--- Testing: C2 Beaconing ---
+2026-04-18 02:35:37,571 [INFO] ▶️  Triggering attack: c2_beacon.py
+2026-04-18 02:36:37,720 [INFO] ⌛ Waiting 40s for processing...
+2026-04-18 02:37:17,727 [INFO] Result: FAIL (Missed/Misclassified)
+2026-04-18 02:37:17,727 [INFO] 
+--- Testing: Data Exfil ---
+2026-04-18 02:37:17,732 [INFO] ▶️  Triggering attack: exfiltration.py

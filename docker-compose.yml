@@ -1,0 +1,121 @@
+version: "3.9"
+
+networks:
+  threat_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.25.0.0/24
+
+services:
+  # ─────────────────────────────────────────────
+  # Redis — event queue & pub/sub backbone
+  # ─────────────────────────────────────────────
+  redis:
+    image: redis:7.2-alpine
+    container_name: intelli_redis
+    restart: unless-stopped
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    networks:
+      threat_net:
+        ipv4_address: 172.25.0.10
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # ─────────────────────────────────────────────
+  # USER / VICTIM container — detection agent + FastAPI backend
+  # ─────────────────────────────────────────────
+  user:
+    build:
+      context: ./user
+      dockerfile: Dockerfile
+    container_name: intelli_user
+    restart: unless-stopped
+    depends_on:
+      redis:
+        condition: service_healthy
+    ports:
+      - "${API_PORT:-8000}:8000"
+    environment:
+      - REDIS_URL=redis://172.25.0.10:6379
+      - LISTEN_IFACE=${LISTEN_IFACE:-eth0}
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+      - CONFIDENCE_CRITICAL=${CONFIDENCE_CRITICAL:-0.90}
+      - CONFIDENCE_HIGH=${CONFIDENCE_HIGH:-0.75}
+      - CONFIDENCE_MEDIUM=${CONFIDENCE_MEDIUM:-0.55}
+      - BATCH_WINDOW_MS=${BATCH_WINDOW_MS:-500}
+      - SUPPRESSION_WINDOW_S=${SUPPRESSION_WINDOW_S:-300}
+    networks:
+      threat_net:
+        ipv4_address: 172.25.0.20
+    pid: "host"
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+      - AUDIT_CONTROL
+      - AUDIT_READ
+    volumes:
+      - ./user/agent/inference/models:/app/agent/inference/models:ro
+      - ./logs:/app/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  # ─────────────────────────────────────────────
+  # ATTACKER container — scripted attack scenarios
+  # ─────────────────────────────────────────────
+  attacker:
+    build:
+      context: ./attacker
+      dockerfile: Dockerfile
+    container_name: intelli_attacker
+    restart: "no"
+    depends_on:
+      user:
+        condition: service_healthy
+    environment:
+      - TARGET_IP=172.25.0.20
+      - TARGET_SSH_PORT=${TARGET_SSH_PORT:-22}
+      - TARGET_HTTP_PORT=${TARGET_API_PORT:-8000}
+      - ATTACK_WARMUP_S=${ATTACK_WARMUP_S:-10}
+      - C2_BEACON_INTERVAL_S=${C2_BEACON_INTERVAL_S:-30}
+      - EXFIL_SIZE_MB=${EXFIL_SIZE_MB:-50}
+    networks:
+      threat_net:
+        ipv4_address: 172.25.0.30
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    volumes:
+      - ./attacker/scripts:/app/scripts
+    command: tail -f /dev/null
+
+  # ─────────────────────────────────────────────
+  # DASHBOARD — React SOC UI (served via nginx in prod, dev server here)
+  # ─────────────────────────────────────────────
+  dashboard:
+    build:
+      context: ./dashboard
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=http://localhost:${API_PORT:-8000}
+        - REACT_APP_WS_URL=ws://localhost:${API_PORT:-8000}/ws/alerts
+    container_name: intelli_dashboard
+    restart: unless-stopped
+    depends_on:
+      - user
+    environment:
+      - REACT_APP_API_URL=http://localhost:${API_PORT:-8000}
+      - REACT_APP_WS_URL=ws://localhost:${API_PORT:-8000}/ws/alerts
+    ports:
+      - "${DASHBOARD_PORT:-3000}:3000"
+    networks:
+      - threat_net

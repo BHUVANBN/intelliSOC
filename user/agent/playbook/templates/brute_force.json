@@ -1,0 +1,70 @@
+{
+  "threat_class": "BRUTE_FORCE",
+  "mitre_id": "T1110.001",
+  "title": "Brute Force / Credential Stuffing Response",
+  "steps": [
+    {
+      "phase": "Contain",
+      "step": 1,
+      "action": "Block attacker IP at firewall",
+      "command": "iptables -A INPUT -s {src_ip} -j DROP",
+      "description": "Immediately block all inbound traffic from the attacking IP address."
+    },
+    {
+      "phase": "Contain",
+      "step": 2,
+      "action": "Lock targeted account temporarily",
+      "command": "usermod -L {targeted_user}",
+      "description": "Prevent further authentication attempts by locking the targeted account."
+    },
+    {
+      "phase": "Investigate",
+      "step": 3,
+      "action": "Dump auth log for attacking IP",
+      "command": "grep {src_ip} /var/log/auth.log | tail -200",
+      "description": "Review all authentication activity from this IP to understand the scope."
+    },
+    {
+      "phase": "Investigate",
+      "step": 4,
+      "action": "Check for any successful logins",
+      "command": "last | grep {src_ip}",
+      "description": "Determine if any login attempt succeeded before detection."
+    },
+    {
+      "phase": "Investigate",
+      "step": 5,
+      "action": "Review SSH session logs for this attack window",
+      "command": "journalctl -u ssh --since '{timestamp}' | grep -E 'Failed|Accepted'",
+      "description": "Get a full timeline of the attack from the SSH daemon logs."
+    },
+    {
+      "phase": "Eradicate",
+      "step": 6,
+      "action": "Force password reset for targeted accounts",
+      "command": "passwd -e {targeted_user}",
+      "description": "Expire credentials to force immediate password change on next login."
+    },
+    {
+      "phase": "Harden",
+      "step": 7,
+      "action": "Enable fail2ban for SSH",
+      "command": "systemctl enable fail2ban && systemctl start fail2ban",
+      "description": "Automatically ban IPs exceeding failed login thresholds."
+    },
+    {
+      "phase": "Harden",
+      "step": 8,
+      "action": "Restrict SSH to key-based authentication",
+      "command": "sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config && systemctl reload ssh",
+      "description": "Eliminate password-based SSH auth entirely."
+    },
+    {
+      "phase": "Report",
+      "step": 9,
+      "action": "Document incident in SIEM",
+      "command": "echo 'INCIDENT: T1110.001 | src={src_ip} | time={timestamp} | attempts={attempt_count}' >> /var/log/intelli-soc/incidents.log",
+      "description": "Create formal incident record with MITRE ATT&CK mapping and evidence bundle."
+    }
+  ]
+}

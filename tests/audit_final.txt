@@ -1,0 +1,38 @@
+2026-04-18 02:03:28,490 [INFO] ═══ Starting Hybrid Detection Accuracy Audit ═══
+2026-04-18 02:03:28,491 [INFO] 
+--- Testing: Brute Force ---
+2026-04-18 02:03:28,497 [INFO] ▶️  Triggering attack: brute_force.py
+2026-04-18 02:05:10,419 [INFO] ⌛ Waiting 15s for processing...
+2026-04-18 02:05:25,427 [INFO] Result: FAIL (Missed/Misclassified)
+2026-04-18 02:05:25,427 [INFO] 
+--- Testing: C2 Beaconing ---
+2026-04-18 02:05:25,431 [INFO] ▶️  Triggering attack: c2_beacon.py
+2026-04-18 02:06:25,542 [INFO] ⌛ Waiting 15s for processing...
+2026-04-18 02:06:40,548 [INFO] Result: FAIL (Missed/Misclassified)
+2026-04-18 02:06:40,548 [INFO] 
+--- Testing: Data Exfil ---
+2026-04-18 02:06:40,551 [INFO] ▶️  Triggering attack: exfiltration.py
+2026-04-18 02:08:41,508 [INFO] ⌛ Waiting 15s for processing...
+2026-04-18 02:08:56,511 [INFO] Result: FAIL (Missed/Misclassified)
+2026-04-18 02:08:56,512 [INFO] 
+--- Testing: Lateral Movement ---
+2026-04-18 02:08:56,514 [INFO] ▶️  Triggering attack: lateral_movement.py
+2026-04-18 02:09:08,919 [INFO] ⌛ Waiting 15s for processing...
+2026-04-18 02:09:23,924 [INFO] Result: FAIL (Missed/Misclassified)
+2026-04-18 02:09:23,924 [INFO] 
+--- Testing: False Positive ---
+2026-04-18 02:09:23,927 [INFO] ▶️  Triggering attack: false_positive.py
+2026-04-18 02:13:40,916 [INFO] ⌛ Waiting 15s for processing...
+2026-04-18 02:13:55,921 [INFO] Result: PASS (No FP)
+2026-04-18 02:13:55,921 [INFO] 
+════════════════════════════════════════
+2026-04-18 02:13:55,921 [INFO]          FINAL ACCURACY REPORT
+2026-04-18 02:13:55,921 [INFO] ════════════════════════════════════════
+2026-04-18 02:13:55,922 [INFO]  ❌ Brute Force          : FAILED
+2026-04-18 02:13:55,922 [INFO]  ❌ C2 Beaconing         : FAILED
+2026-04-18 02:13:55,922 [INFO]  ❌ Data Exfil           : FAILED
+2026-04-18 02:13:55,922 [INFO]  ❌ Lateral Movement     : FAILED
+2026-04-18 02:13:55,922 [INFO]  ✅ False Positive       : SUCCESS
+2026-04-18 02:13:55,922 [INFO] ════════════════════════════════════════
+2026-04-18 02:13:55,922 [INFO]  TOTAL ACCURACY: 20.0%
+2026-04-18 02:13:55,922 [INFO] ════════════════════════════════════════

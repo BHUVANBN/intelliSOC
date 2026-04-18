@@ -1,0 +1,70 @@
+{
+  "threat_class": "C2_BEACON",
+  "mitre_id": "T1071.001",
+  "title": "Command & Control Beacon Response",
+  "steps": [
+    {
+      "phase": "Isolate",
+      "step": 1,
+      "action": "Immediately quarantine host from network",
+      "command": "iptables -A OUTPUT -d {dst_ip} -j DROP && iptables -A INPUT -s {dst_ip} -j DROP",
+      "description": "Sever the C2 communication channel. This is the highest priority action."
+    },
+    {
+      "phase": "Contain",
+      "step": 2,
+      "action": "Block C2 IP at perimeter firewall",
+      "command": "iptables -I FORWARD 1 -s {dst_ip} -j DROP && iptables -I FORWARD 1 -d {dst_ip} -j DROP",
+      "description": "Block C2 destination at the network perimeter to prevent re-establishment."
+    },
+    {
+      "phase": "Investigate",
+      "step": 3,
+      "action": "Identify beaconing process",
+      "command": "ss -tp | grep {dst_ip} && ps aux | grep {pid}",
+      "description": "Identify the specific process maintaining the C2 channel."
+    },
+    {
+      "phase": "Investigate",
+      "step": 4,
+      "action": "Dump process memory for IOCs",
+      "command": "gcore {pid} && strings core.{pid} | grep -E 'http|https|cmd|exec|run|wget|curl'",
+      "description": "Extract indicators of compromise from the malicious process memory."
+    },
+    {
+      "phase": "Investigate",
+      "step": 5,
+      "action": "Check beacon interval and pattern",
+      "command": "tcpdump -i eth0 -n host {dst_ip} -w /tmp/c2_capture.pcap &",
+      "description": "Capture traffic to characterize beacon interval, encoding, and commands received."
+    },
+    {
+      "phase": "Investigate",
+      "step": 6,
+      "action": "Search for implant persistence mechanisms",
+      "command": "crontab -l; ls /etc/cron.d/; systemctl list-units --state=failed; ls ~/.config/autostart/",
+      "description": "Find how the implant maintains persistence across reboots."
+    },
+    {
+      "phase": "Eradicate",
+      "step": 7,
+      "action": "Kill malicious process and remove persistence",
+      "command": "kill -9 {pid} && crontab -r && systemctl disable {service_name}",
+      "description": "Terminate the implant and remove all identified persistence mechanisms."
+    },
+    {
+      "phase": "Hunt",
+      "step": 8,
+      "action": "Search for lateral movement indicators on all internal hosts",
+      "command": "for ip in $(arp -n | awk '{print $1}'); do nmap -p 445,22,3389 $ip; done",
+      "description": "The presence of C2 implies active compromise — hunt for pivot activity on all hosts."
+    },
+    {
+      "phase": "Report",
+      "step": 9,
+      "action": "File IR report with MITRE T1071.001 + IOC bundle",
+      "command": "echo 'C2 INCIDENT: T1071.001 | c2_ip={dst_ip} | pid={pid} | interval={beacon_interval}s | time={timestamp}' >> /var/log/intelli-soc/incidents.log",
+      "description": "Include beacon interval, C2 IP, process name, and all extracted IOCs."
+    }
+  ]
+}

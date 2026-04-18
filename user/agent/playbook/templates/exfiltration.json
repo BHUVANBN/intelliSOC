@@ -1,0 +1,70 @@
+{
+  "threat_class": "EXFILTRATION",
+  "mitre_id": "T1048.003",
+  "title": "Data Exfiltration Response",
+  "steps": [
+    {
+      "phase": "Contain",
+      "step": 1,
+      "action": "Block outbound traffic to exfiltration destination",
+      "command": "iptables -A OUTPUT -d {dst_ip} -j DROP",
+      "description": "Immediately stop ongoing data transfer to the attacker-controlled server."
+    },
+    {
+      "phase": "Contain",
+      "step": 2,
+      "action": "Rate-limit outbound Internet traffic as a precaution",
+      "command": "tc qdisc add dev eth0 root tbf rate 1mbit burst 32kbit latency 400ms",
+      "description": "Throttle outbound traffic to prevent any remaining exfiltration channels."
+    },
+    {
+      "phase": "Investigate",
+      "step": 3,
+      "action": "Identify exfiltrating process",
+      "command": "ss -tp | grep {dst_ip} && lsof -i -n | grep {dst_ip}",
+      "description": "Identify which process is responsible for the data transfer."
+    },
+    {
+      "phase": "Investigate",
+      "step": 4,
+      "action": "Estimate volume of exfiltrated data",
+      "command": "iftop -n -f 'host {dst_ip}' -t -s 10",
+      "description": "Quantify how much data has been transferred to the external destination."
+    },
+    {
+      "phase": "Investigate",
+      "step": 5,
+      "action": "Identify files accessed by exfiltrating process",
+      "command": "lsof -p {pid} | grep -E 'REG|DIR' | awk '{print $9}'",
+      "description": "Determine what data was accessed and may have been exfiltrated."
+    },
+    {
+      "phase": "Investigate",
+      "step": 6,
+      "action": "Check exfiltration destination intelligence",
+      "command": "whois {dst_ip} && dig -x {dst_ip}",
+      "description": "Gather threat intelligence on the exfiltration destination IP."
+    },
+    {
+      "phase": "Eradicate",
+      "step": 7,
+      "action": "Kill exfiltrating process",
+      "command": "kill -9 {pid}",
+      "description": "Terminate the process responsible for data exfiltration."
+    },
+    {
+      "phase": "Harden",
+      "step": 8,
+      "action": "Add exfiltration destination to firewall blocklist",
+      "command": "iptables -A OUTPUT -d {dst_ip} -j DROP && iptables-save > /etc/iptables/rules.v4",
+      "description": "Permanently block this destination and save the firewall rule."
+    },
+    {
+      "phase": "Report",
+      "step": 9,
+      "action": "Notify data protection officer — potential data breach",
+      "command": "echo 'DATA BREACH ALERT: T1048.003 | dst={dst_ip} | bytes={bytes_transferred} | time={timestamp}' >> /var/log/intelli-soc/incidents.log",
+      "description": "Formal breach notification per IR policy. Include data classification and volume."
+    }
+  ]
+}
