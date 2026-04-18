@@ -6,7 +6,6 @@ function SimulationHub({ onStartSimulation }) {
   const [profiles, setProfiles] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const [startingDemo, setStartingDemo] = useState(false)
 
   useEffect(() => {
     const init = async () => {
@@ -22,60 +21,48 @@ function SimulationHub({ onStartSimulation }) {
     init()
   }, [])
 
-  const startSimulation = async (attackType) => {
-    try {
-      await api.startSimulation(attackType, 1.0)
-      onStartSimulation(attackType)
-    } catch (err) {
-      if (err.message && err.message.includes('409')) {
-        onStartSimulation(attackType)
-      } else {
-        setError('Failed to start simulation')
-      }
-    }
-  }
+  if (loading) return (
+    <div style={{ padding: 100, textAlign: 'center' }}>
+       <div className="pulse-dot" style={{ width: 40, height: 40, background: 'var(--blue)', margin: '0 auto 20px' }} />
+       <div className="eyebrow">Initializing Lab Environment...</div>
+    </div>
+  )
 
-  const handleLaunchDemo = async () => {
-    setStartingDemo(true)
-    try {
-      await api.startSimulation('demo', 2.0)
-      onStartSimulation('demo')
-    } catch (err) {
-      onStartSimulation('demo')
-    }
-  }
-
-  if (loading) return <div className="loading" style={{ padding: 40, textAlign: 'center', opacity: 0.6 }}>Initializing Lab Environment...</div>
-  if (error) return <div className="error" style={{ padding: 40, color: 'var(--red)' }}>{error}</div>
+  if (error) return <div className="error" style={{ padding: 40, color: 'var(--red)', textAlign: 'center' }}>{error}</div>
 
   return (
-    <div className="sim-hub-container">
+    <div className="sim-hub-container anim-slide-up">
       
       {/* ── HEADER ── */}
       <div className="sim-header">
-        <h2>Simulation Lab</h2>
-        <p>Orchestrate synthetic threats to evaluate detection logic and response playbooks.</p>
+        <h2>Simulate Lab</h2>
+        <p>
+          Execute high-fidelity synthetic threat scenarios. Each scenario is mapped to 
+          <span style={{ color: 'var(--blue)', fontWeight: 700 }}> MITRE ATT&CK®</span> techniques.
+        </p>
       </div>
 
       <div className="sim-grid">
         
-        {/* ── DEMO BANNER ── */}
-        <div className="demo-row">
+        {/* ── MULTI-STAGE DEMO ── */}
+        <div className="demo-row anim-slide-up" style={{ animationDelay: '0.1s' }}>
           <div className="demo-content">
-            <h3>🎬 Multi-Stage Hackathon Demo</h3>
-            <p>
-              Launch a full attack lifecycle simulation including Reconnaissance, 
-              Lateral Movement, and Data Exfiltration. Perfect for showcasing end-to-end SOC capabilities.
-            </p>
+            <div className="eyebrow" style={{ color: 'var(--purple)', marginBottom: 8 }}>Featured Campaign</div>
+            <h3>🎬 Full Attack Lifecycle Demo</h3>
+            <p>A high-impact demonstration covering the entire kill chain.</p>
           </div>
-          <button className="demo-btn" onClick={handleLaunchDemo} disabled={startingDemo}>
-            {startingDemo ? 'INITIALIZING...' : 'LAUNCH FULL DEMO 🚀'}
+          <button className="demo-btn" onClick={() => onStartSimulation('demo')}>
+            LAUNCH FULL DEMO 🚀
           </button>
         </div>
 
-        {/* ── ATTACK CARDS ── */}
-        {profiles.map((profile) => (
-          <div key={profile.id} className={`premium-card ${profile.id}`}>
+        {/* ── INDIVIDUAL SCENARIOS ── */}
+        {profiles.map((profile, i) => (
+          <div 
+            key={profile.id} 
+            className={`premium-card ${profile.id} anim-slide-up`} 
+            style={{ animationDelay: `${0.2 + (i * 0.1)}s` }}
+          >
             <div className="card-top">
               <div className="card-icon-box">{profile.icon || '🛡️'}</div>
               <div className="card-mitre">{profile.mitre?.id || 'T1000'}</div>
@@ -86,47 +73,32 @@ function SimulationHub({ onStartSimulation }) {
 
             <div className="card-metadata">
               <div className="meta-item">
-                <span className="meta-label">Duration</span>
-                <span className="meta-val">{profile.duration_seconds}s</span>
+                <span className="meta-label">Complexity</span>
+                <span className="meta-val">Advanced</span>
               </div>
               <div className="meta-item">
                 <span className="meta-label">Severity</span>
-                <span className="meta-val" style={{ color: `var(--${profile.severity?.toLowerCase()})` }}>
+                <span className="meta-val" style={{ color: profile.severity === 'Critical' ? 'var(--red)' : 'var(--orange)' }}>
                   {profile.severity}
                 </span>
-              </div>
-              <div className="meta-item">
-                <span className="meta-label">Tactic</span>
-                <span className="meta-val">{profile.mitre?.tactic}</span>
-              </div>
-              <div className="meta-item">
-                <span className="meta-label">Phase</span>
-                <span className="meta-val">Simulation</span>
               </div>
             </div>
 
             <div className="card-signals">
-              <div className="card-signals-title">
-                <span>🔍</span> Detection Signals
-              </div>
-              <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-                {profile.indicators?.slice(0, 3).map((ind, i) => (
-                  <span key={i} className="signal-tag">{ind}</span>
+              <div className="card-signals-title"><span>🔍</span> Detection Signals</div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                {profile.indicators?.slice(0, 2).map((ind, idx) => (
+                  <span key={idx} className="signal-tag" style={{ margin: 0 }}>{ind}</span>
                 ))}
               </div>
             </div>
 
-            <button className="card-btn" onClick={() => startSimulation(profile.id)}>
-              <span>▶</span> START SCENARIO
+            <button className="card-btn" onClick={() => onStartSimulation(profile.id)}>
+               <span>▶</span> START SIMULATION
             </button>
           </div>
         ))}
 
-      </div>
-
-      {/* ── INFO FOOTER ── */}
-      <div style={{ marginTop: 40, padding: 20, textAlign: 'center', opacity: 0.5, fontSize: '0.8rem' }}>
-        Note: These simulations generate synthetic telemetry and will not affect any live production systems.
       </div>
     </div>
   )

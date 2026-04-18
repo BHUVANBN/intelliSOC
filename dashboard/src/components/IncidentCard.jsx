@@ -36,17 +36,17 @@ export default function IncidentCard({ incident, fetchPlaybook }) {
   return (
     <>
       <div
-        className="animate-fade-up"
+        className="anim-slide-up"
         style={{
-          background: 'var(--bg-card)',
-          border: `1px solid ${SEV_BORDER[incident.severity] || SEV_BORDER.LOW}`,
-          borderRadius: 'var(--radius-lg)',
-          marginBottom: 10,
+          background: 'var(--bg-surface)',
+          border: `1px solid ${SEV_BORDER[incident.severity] || 'var(--border)'}`,
+          borderRadius: 'var(--r-md)',
+          marginBottom: 12,
           cursor: 'pointer',
-          transition: 'all 0.2s',
+          transition: 'all 0.3s var(--ease)',
           boxShadow: incident.severity === 'CRITICAL'
-            ? '0 0 16px rgba(239,68,68,0.15)'
-            : 'none',
+            ? '0 8px 32px rgba(239,68,68,0.1)'
+            : '0 4px 20px rgba(0,0,0,0.2)',
         }}
         onClick={() => setExpanded(e => !e)}
       >

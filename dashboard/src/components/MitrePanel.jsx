@@ -28,37 +28,33 @@ export default function MitrePanel({ incidents }) {
   );
  
   return (
-    <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(220px,1fr))',gap:10}}>
+    <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(240px,1fr))',gap:12}}>
       {techs.map(([id,count])=>{
         const m = MITRE_META[id] || {tactic:'Unknown',name:id,icon:'⚠️',color:'#8E8E93'};
         return (
           <a key={id} href={`https://attack.mitre.org/techniques/${id.replace('.','/')}`}
              target="_blank" rel="noreferrer" style={{textDecoration:'none'}}>
             <div className="card anim-fade-up" style={{
-              borderLeft:`3px solid ${m.color}`,
-              background:`color-mix(in srgb, ${m.color} 5%, var(--bg-card))`,
-              padding:'12px 14px', cursor:'pointer',
-              transition:'all 0.2s',
+              borderLeft:`4px solid ${m.color}`,
+              background:`color-mix(in srgb, ${m.color} 4%, var(--bg-surface))`,
+              padding:'16px 20px', cursor:'pointer',
             }}
-            onMouseEnter={e=>e.currentTarget.style.background=`color-mix(in srgb, ${m.color} 10%, var(--bg-card))`}
-            onMouseLeave={e=>e.currentTarget.style.background=`color-mix(in srgb, ${m.color} 5%, var(--bg-card))`}
             >
-              <div style={{display:'flex',justifyContent:'space-between',marginBottom:8}}>
-                <span style={{fontSize:22}}>{m.icon}</span>
+              <div style={{display:'flex',justifyContent:'space-between',marginBottom:12}}>
+                <span style={{fontSize:24}}>{m.icon}</span>
                 <span style={{
-                  padding:'2px 7px', borderRadius:'var(--r-xs)',
-                  background:`color-mix(in srgb, ${m.color} 20%, transparent)`,
-                  color:m.color, fontSize:'0.70rem', fontWeight:700,
+                  padding:'3px 10px', borderRadius:'100px',
+                  background:`color-mix(in srgb, ${m.color} 15%, transparent)`,
+                  color:m.color, fontSize:'0.75rem', fontWeight:800,
                 }}>
-                  {count}×
+                  {count} Detection{count > 1 ? 's' : ''}
                 </span>
               </div>
-              <div className="mono" style={{color:'var(--text-accent)',fontSize:'0.70rem',marginBottom:4}}>{id}</div>
-              <div style={{fontWeight:700,fontSize:'0.78rem',lineHeight:1.3,color:'var(--text-primary)',marginBottom:4}}>
+              <div className="mono" style={{color:'var(--blue)',fontSize:'0.75rem',fontWeight:700,marginBottom:6}}>{id}</div>
+              <div style={{fontWeight:800,fontSize:'0.85rem',lineHeight:1.4,color:'#fff',marginBottom:8}}>
                 {m.name}
               </div>
-              <div style={{color:m.color,fontSize:'0.65rem',fontWeight:700,
-                            textTransform:'uppercase',letterSpacing:'0.07em'}}>
+              <div className="eyebrow" style={{color:m.color, marginBottom:0}}>
                 {m.tactic}
               </div>
             </div>

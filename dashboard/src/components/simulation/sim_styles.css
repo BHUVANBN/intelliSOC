@@ -8,41 +8,41 @@
 
 .sim-header {
   margin-bottom: 40px;
-  border-left: 4px solid var(--blue);
-  padding-left: 20px;
 }
 
 .sim-header h2 {
-  font-size: 2rem;
-  font-weight: 800;
-  margin: 0;
-  background: linear-gradient(to right, #fff, var(--text-secondary));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  font-size: 2.2rem;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  margin-bottom: 8px;
+  color: #fff;
 }
 
 .sim-header p {
-  color: var(--text-tertiary);
-  margin-top: 8px;
-  font-size: 0.95rem;
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  max-width: 600px;
+  line-height: 1.6;
 }
 
+/* ── Premium Layout ── */
 .sim-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
   gap: 24px;
 }
 
 .premium-card {
-  position: relative;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 20px;
-  padding: 24px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  overflow: hidden;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 32px;
   display: flex;
   flex-direction: column;
+  gap: 20px;
+  transition: all 0.3s var(--ease);
+  position: relative;
+  overflow: hidden;
 }
 
 .premium-card::before {
@@ -52,6 +52,7 @@
   background: linear-gradient(135deg, rgba(255,255,255,0.05), transparent);
   opacity: 0;
   transition: opacity 0.3s;
+  pointer-events: none; /* DO NOT BLOCK CLICKS */
 }
 
 .premium-card:hover {
@@ -66,10 +67,21 @@
 }
 
 /* Card Accents */
-.premium-card.brute_force { border-top: 3px solid var(--red); }
-.premium-card.c2_beacon { border-top: 3px solid var(--purple); }
-.premium-card.lateral_movement { border-top: 3px solid var(--orange); }
-.premium-card.data_exfiltration { border-top: 3px solid var(--cyan); }
+.premium-card.brute_force {
+  border-top: 3px solid var(--red);
+}
+
+.premium-card.c2_beacon {
+  border-top: 3px solid var(--purple);
+}
+
+.premium-card.lateral_movement {
+  border-top: 3px solid var(--orange);
+}
+
+.premium-card.data_exfiltration {
+  border-top: 3px solid var(--cyan);
+}
 
 .card-top {
   display: flex;
@@ -82,19 +94,19 @@
   width: 48px;
   height: 48px;
   border-radius: 12px;
-  background: rgba(255,255,255,0.05);
+  background: rgba(255, 255, 255, 0.05);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 24px;
-  border: 1px solid rgba(255,255,255,0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .card-mitre {
   font-family: var(--font-mono);
   font-size: 0.7rem;
   color: var(--text-tertiary);
-  background: rgba(255,255,255,0.05);
+  background: rgba(255, 255, 255, 0.05);
   padding: 4px 8px;
   border-radius: 4px;
   letter-spacing: 0.05em;
@@ -121,7 +133,7 @@
   gap: 12px;
   margin-bottom: 24px;
   padding: 16px;
-  background: rgba(0,0,0,0.2);
+  background: rgba(0, 0, 0, 0.2);
   border-radius: 12px;
 }
 
@@ -162,45 +174,49 @@
 .signal-tag {
   display: inline-block;
   font-size: 0.72rem;
-  background: rgba(255,255,255,0.04);
+  background: rgba(255, 255, 255, 0.04);
   color: var(--text-secondary);
   padding: 4px 10px;
   border-radius: 6px;
   margin: 0 6px 6px 0;
-  border: 1px solid rgba(255,255,255,0.08);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .card-btn {
   width: 100%;
-  padding: 12px;
-  border-radius: 10px;
+  padding: 14px;
+  border-radius: 12px;
   border: none;
-  font-weight: 700;
-  font-size: 0.88rem;
+  font-weight: 800;
+  font-size: 0.9rem;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s var(--ease);
   background: var(--blue);
   color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 10px;
+  position: relative;
+  z-index: 10; /* STAY ON TOP */
+  box-shadow: 0 4px 12px rgba(10,132,255,0.2);
 }
 
 .card-btn:hover {
-  filter: brightness(1.2);
-  transform: scale(1.02);
+  filter: brightness(1.15);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(10,132,255,0.4);
 }
 
 .card-btn:active {
-  transform: scale(0.98);
+  transform: translateY(0) scale(0.96);
 }
 
 /* Demo Banner Premium */
 .demo-row {
   grid-column: 1 / -1;
-  background: linear-gradient(135deg, rgba(10,132,255,0.1), rgba(191,90,242,0.1));
-  border: 1px solid rgba(10,132,255,0.2);
+  background: linear-gradient(135deg, rgba(10, 132, 255, 0.1), rgba(191, 90, 242, 0.1));
+  border: 1px solid rgba(10, 132, 255, 0.2);
   border-radius: 20px;
   padding: 32px;
   margin-bottom: 32px;
@@ -219,6 +235,7 @@
   font-size: 120px;
   opacity: 0.05;
   transform: rotate(15deg);
+  pointer-events: none; /* DO NOT BLOCK CLICKS */
 }
 
 .demo-content h3 {
@@ -241,15 +258,18 @@
   font-weight: 800;
   border: none;
   cursor: pointer;
-  box-shadow: 0 4px 20px rgba(10,132,255,0.3);
+  box-shadow: 0 4px 20px rgba(10, 132, 255, 0.3);
   white-space: nowrap;
 }
 
 /* ── Attack Briefing Premium ── */
 .briefing-overlay {
   position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: radial-gradient(circle at center, rgba(10,132,255,0.05) 0%, #000 100%);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at center, rgba(10, 132, 255, 0.05) 0%, #000 100%);
   z-index: 1000;
   display: flex;
   align-items: center;
@@ -258,8 +278,8 @@
 }
 
 .briefing-container {
-  background: rgba(0,0,0,0.8);
-  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(0, 0, 0, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(20px);
   width: 100%;
   max-width: 900px;
@@ -267,7 +287,7 @@
   padding: 48px;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 20px 60px rgba(0,0,0,1);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 1);
 }
 
 .briefing-header {
@@ -275,20 +295,20 @@
   align-items: center;
   gap: 32px;
   margin-bottom: 48px;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   padding-bottom: 32px;
 }
 
 .briefing-icon {
   font-size: 64px;
-  background: rgba(255,255,255,0.05);
+  background: rgba(255, 255, 255, 0.05);
   width: 100px;
   height: 100px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 24px;
-  border: 1px solid rgba(255,255,255,0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .briefing-title {
@@ -308,9 +328,9 @@
 
 .briefing-story {
   font-family: var(--font-mono);
-  font-size: 1.2rem;
+  font-size: 1.15rem;
   line-height: 1.8;
-  color: var(--text-secondary);
+  color: #fff; /* Explicit White */
   margin-bottom: 48px;
 }
 
@@ -319,8 +339,15 @@
   transition: all 0.3s;
 }
 
-.briefing-line.done { opacity: 0.3; }
-.briefing-line.active { opacity: 1; transform: translateX(10px); color: #fff; }
+.briefing-line.done {
+  opacity: 0.3;
+}
+
+.briefing-line.active {
+  opacity: 1;
+  transform: translateX(10px);
+  color: #fff;
+}
 
 .briefing-timeline {
   display: grid;
@@ -331,8 +358,8 @@
 
 .briefing-timeline-step {
   padding: 16px;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.06);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 12px;
 }
 
@@ -345,41 +372,52 @@
 
 .briefing-timeline-desc {
   font-size: 0.82rem;
-  color: var(--text-secondary);
+  color: #fff;
+  opacity: 0.95;
 }
 
 .briefing-start-btn {
   background: linear-gradient(135deg, var(--blue) 0%, #0056b3 100%);
   color: #fff;
   font-weight: 900;
-  padding: 20px 60px;
-  border-radius: 16px;
+  padding: 22px 64px;
+  border-radius: 18px;
   border: none;
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   cursor: pointer;
-  box-shadow: 0 0 30px rgba(10,132,255,0.3);
+  box-shadow: 0 0 40px rgba(10,132,255,0.4);
   transition: all 0.3s;
   width: 100%;
+  position: relative;
+  z-index: 2000; /* OVERLAY IS 1000 */
 }
 
 .briefing-start-btn:hover {
   transform: scale(1.02);
-  box-shadow: 0 0 50px rgba(10,132,255,0.5);
+  box-shadow: 0 0 50px rgba(10, 132, 255, 0.5);
 }
 
 /* ── Active Dashboard Visual Polish ── */
 .scanline {
   position: absolute;
-  top: 0; left: 0; width: 100%; height: 2px;
-  background: rgba(10,132,255,0.1);
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: rgba(10, 132, 255, 0.1);
   animation: scan 4s linear infinite;
   z-index: 10;
   pointer-events: none;
 }
 
 @keyframes scan {
-  from { top: 0; }
-  to { top: 100%; }
+  from {
+    top: 0;
+  }
+
+  to {
+    top: 100%;
+  }
 }
 
 .node-active {
@@ -387,7 +425,18 @@
 }
 
 @keyframes pulse-node {
-  0% { transform: scale(1); box-shadow: 0 0 0px var(--glow-blue); }
-  50% { transform: scale(1.05); box-shadow: 0 0 20px var(--glow-blue); }
-  100% { transform: scale(1); box-shadow: 0 0 0px var(--glow-blue); }
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0px var(--glow-blue);
+  }
+
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px var(--glow-blue);
+  }
+
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0px var(--glow-blue);
+  }
 }
