@@ -130,6 +130,9 @@ export function useAlertStream() {
   }, []);
 
   const clearIncidents = useCallback(() => setIncidents([]), []);
+  const removeIncident = useCallback((id) => {
+    setIncidents(prev => prev.filter(i => i.incident_id !== id));
+  }, []);
 
-  return { incidents, connected, stats, eventsPerSec, fetchPlaybook, clearIncidents, toast };
+  return { incidents, connected, stats, eventsPerSec, fetchPlaybook, clearIncidents, removeIncident, toast };
 }

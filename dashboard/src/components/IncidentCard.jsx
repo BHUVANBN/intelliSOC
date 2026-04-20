@@ -11,7 +11,7 @@ const SEV_BORDER = {
   BENIGN: 'rgba(16,185,129,0.2)',
 };
 
-export default function IncidentCard({ incident, fetchPlaybook }) {
+export default function IncidentCard({ incident, fetchPlaybook, removeIncident }) {
   const [expanded, setExpanded] = useState(false);
   const [playbook, setPlaybook] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -39,7 +39,7 @@ export default function IncidentCard({ incident, fetchPlaybook }) {
         className="anim-slide-up"
         style={{
           background: 'var(--bg-surface)',
-          border: `1px solid ${SEV_BORDER[incident.severity] || 'var(--border)'}`,
+          border: incident.severity === 'BENIGN' ? '2px solid #22c55e' : `1px solid ${SEV_BORDER[incident.severity] || 'var(--border)'}`,
           borderRadius: 'var(--r-md)',
           marginBottom: 12,
           cursor: 'pointer',
@@ -79,7 +79,11 @@ export default function IncidentCard({ incident, fetchPlaybook }) {
 
           {/* Confidence meter */}
           <div style={{ textAlign: 'right', flexShrink: 0 }}>
-            <div style={{ fontSize: '1.1rem', fontWeight: 700, color: confColor(incident.confidence) }}>
+            <div style={{ 
+              fontSize: '1.1rem', 
+              fontWeight: 700, 
+              color: incident.severity === 'BENIGN' ? '#166534' : confColor(incident.confidence) 
+            }}>
               {confPct}%
             </div>
             <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>CONF</div>
@@ -130,7 +134,7 @@ export default function IncidentCard({ incident, fetchPlaybook }) {
                       borderRadius: 6,
                       padding: '3px 8px',
                       fontSize: '0.72rem',
-                      color: val > 0 ? '#f87171' : '#34d399',
+                      color: val > 0 ? '#f87171' : (incident.severity === 'BENIGN' ? '#166534' : '#34d399'),
                     }}>
                       {feat}: {val > 0 ? '+' : ''}{val.toFixed(3)}
                     </span>
@@ -140,14 +144,16 @@ export default function IncidentCard({ incident, fetchPlaybook }) {
             )}
 
             <div style={{ display: 'flex', gap: 8 }}>
-              <button
-                className="btn btn-primary"
-                onClick={handlePlaybook}
-                disabled={loadingPb}
-                id={`playbook-btn-${incident.incident_id}`}
-              >
-                {loadingPb ? '⏳ Loading...' : '📋 Open Playbook'}
-              </button>
+              {incident.severity !== 'BENIGN' && (
+                <button
+                  className="btn btn-primary"
+                  onClick={handlePlaybook}
+                  disabled={loadingPb}
+                  id={`playbook-btn-${incident.incident_id}`}
+                >
+                  {loadingPb ? '⏳ Loading...' : '📋 Open Playbook'}
+                </button>
+              )}
               <button
                 className="btn btn-ghost"
                 onClick={(e) => { e.stopPropagation(); }}
@@ -163,6 +169,7 @@ export default function IncidentCard({ incident, fetchPlaybook }) {
         <PlaybookDrawer
           playbook={playbook}
           incident={incident}
+          removeIncident={removeIncident}
           onClose={() => setDrawerOpen(false)}
         />
       )}

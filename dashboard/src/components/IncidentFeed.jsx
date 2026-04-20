@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import IncidentCard from './IncidentCard';
  
-export default function IncidentFeed({ incidents, fetchPlaybook, filter }) {
+export default function IncidentFeed({ incidents, fetchPlaybook, removeIncident, filter }) {
   const ref = useRef(null);
  
   useEffect(() => {
@@ -26,7 +26,7 @@ export default function IncidentFeed({ incidents, fetchPlaybook, filter }) {
         </div>
       ) : (
         shown.map(inc => (
-          <IncidentCard key={inc.incident_id} incident={inc} fetchPlaybook={fetchPlaybook}/>
+          <IncidentCard key={inc.incident_id} incident={inc} fetchPlaybook={fetchPlaybook} removeIncident={removeIncident}/>
         ))
       )}
     </div>

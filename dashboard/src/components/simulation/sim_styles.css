@@ -104,12 +104,15 @@
 
 .card-mitre {
   font-family: var(--font-mono);
-  font-size: 0.7rem;
-  color: var(--text-tertiary);
-  background: rgba(255, 255, 255, 0.05);
-  padding: 4px 8px;
-  border-radius: 4px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--blue);
+  background: rgba(10, 132, 255, 0.1);
+  padding: 6px 12px;
+  border-radius: 6px;
   letter-spacing: 0.05em;
+  border: 1px solid rgba(10, 132, 255, 0.2);
+  box-shadow: 0 0 15px rgba(10, 132, 255, 0.1);
 }
 
 .card-title {
@@ -247,19 +250,27 @@
   color: var(--text-secondary);
   max-width: 600px;
   margin: 0;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
+  line-height: 1.6;
 }
 
 .demo-btn {
   background: linear-gradient(to right, var(--blue), var(--purple));
   color: #fff;
-  padding: 14px 28px;
-  border-radius: 12px;
-  font-weight: 800;
+  padding: 18px 42px;
+  border-radius: 14px;
+  font-weight: 900;
+  font-size: 1.05rem;
   border: none;
   cursor: pointer;
-  box-shadow: 0 4px 20px rgba(10, 132, 255, 0.3);
+  box-shadow: 0 10px 30px rgba(10, 132, 255, 0.4);
   white-space: nowrap;
+  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.demo-btn:hover {
+  transform: scale(1.05) translateY(-2px);
+  box-shadow: 0 15px 40px rgba(10, 132, 255, 0.6);
 }
 
 /* ── Attack Briefing Premium ── */

@@ -14,7 +14,7 @@ const API = process.env.REACT_APP_API_URL || 'http://localhost:8001';
 
 export default function App() {
   const { incidents, connected, stats, eventsPerSec,
-    fetchPlaybook, clearIncidents, toast } = useAlertStream();
+    fetchPlaybook, clearIncidents, removeIncident, toast } = useAlertStream();
   
   const [tab, setTab] = useState('incidents'); // incidents | timeline | mitre | simulate
   const [filter, setFilter] = useState('ALL');
@@ -149,13 +149,13 @@ export default function App() {
             )}
             {tab === 'timeline' && <span style={{ fontWeight: 800, fontSize: '0.9rem', color: '#fff' }}>THREAT PROPAGATION TIMELINE</span>}
             {tab === 'mitre' && <span style={{ fontWeight: 800, fontSize: '0.9rem', color: '#fff' }}>ATT&CK MATRIX OVERLAY</span>}
-            {tab === 'simulate' && <span style={{ fontWeight: 800, fontSize: '0.9rem', color: '#fff' }}>SIMULATION LAB · DEMO ENVIRONMENT</span>}
+            {tab === 'simulate' && <span style={{ fontWeight: 800, fontSize: '0.9rem', color: '#fff' }}>SIMULATION LAB</span>}
           </div>
 
           {/* Panel body */}
           <div style={{ flex: 1, padding: tab === 'simulate' ? 0 : '20px', overflowY: 'auto', minHeight: 0 }}>
             {tab === 'incidents' && (
-              <IncidentFeed incidents={incidents} fetchPlaybook={fetchPlaybook} filter={filter} />
+              <IncidentFeed incidents={incidents} fetchPlaybook={fetchPlaybook} removeIncident={removeIncident} filter={filter} />
             )}
             {tab === 'timeline' && <ThreatTimeline incidents={incidents} />}
             {tab === 'mitre' && <MitrePanel incidents={incidents} />}
@@ -238,13 +238,7 @@ export default function App() {
                 <span className="mono" style={{ color: 'var(--text-secondary)', fontWeight: 700 }}>{v}</span>
               </div>
             ))}
-            <div style={{
-              marginTop: 16, padding: '10px', background: 'rgba(10,132,255,0.06)',
-              borderRadius: 'var(--r-sm)', border: '1px solid rgba(10,132,255,0.12)',
-              fontSize: '0.72rem', color: 'var(--blue)', textAlign: 'center', fontWeight: 800
-            }}>
-              DEMO MODE · HACK MALENADU '26
-            </div>
+            {/* System Status Banner removed per user request */}
           </div>
         </div>
         )}

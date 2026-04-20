@@ -240,6 +240,43 @@ def create_app(correlator: Correlator, normalizer=None) -> FastAPI:
 
         return playbook
 
+    @app.post("/api/playbook/mitigate", tags=["Playbooks"])
+    async def mitigate_incident(request: Request):
+        """Execute a mitigation script and return the terminal output."""
+        try:
+            body = await request.json()
+            incident_id = body.get("incident_id")
+            script = body.get("script")
+            
+            if not script:
+                raise HTTPException(status_code=400, detail="No script provided")
+
+            log.info(f"Executing mitigation for incident {incident_id}")
+            
+            import subprocess
+            # Execute the bash script
+            process = subprocess.Popen(
+                ['/bin/bash'],
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True
+            )
+            stdout, stderr = process.communicate(input=script)
+            
+            status = "success" if process.returncode == 0 else "error"
+            message = "Mitigation script executed successfully" if status == "success" else "Mitigation script failed"
+            
+            return {
+                "status": status,
+                "message": message,
+                "output": stdout if status == "success" else stderr,
+                "return_code": process.returncode
+            }
+        except Exception as e:
+            log.error(f"Mitigation execution failed: {e}")
+            raise HTTPException(status_code=500, detail=str(e))
+
     @app.get("/api/stats", response_model=StatsResponse, tags=["Stats"])
     async def get_stats():
         """Get aggregated detection statistics."""
