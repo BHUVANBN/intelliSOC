@@ -153,7 +153,7 @@ export default function App() {
           </div>
 
           {/* Panel body */}
-          <div style={{ flex: 1, padding: tab === 'simulate' ? 0 : '20px', overflowY: 'auto', minHeight: 0 }}>
+          <div style={{ flex: 1, padding: tab === 'simulate' ? '32px' : '20px', overflowY: 'auto', minHeight: 0 }}>
             {tab === 'incidents' && (
               <IncidentFeed incidents={incidents} fetchPlaybook={fetchPlaybook} removeIncident={removeIncident} filter={filter} />
             )}

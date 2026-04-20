@@ -48,35 +48,58 @@ class SimulationEngine:
         self._stop_event.clear()
         self._pause_event.set()
 
-        gen = self.generators.get(attack_type)
-        if not gen:
-            self.is_running = False
-            return
+        log.info(f"🚀 Starting simulation: {attack_type}")
 
-        profile = ATTACK_PROFILES.get(attack_type, {})
-        duration = profile.get("duration_seconds", 60)
-        raw_events = gen.generate_events(duration)
-        total = len(raw_events)
-        await self._execute(raw_events, attack_type, profile)
+        try:
+            gen = self.generators.get(attack_type)
+            if not gen:
+                log.error(f"Unknown generator for {attack_type}")
+                return
+
+            profile = ATTACK_PROFILES.get(attack_type, {})
+            duration = profile.get("duration_seconds", 60)
+            raw_events = gen.generate_events(duration)
+            
+            log.info(f"Generated {len(raw_events)} events for {attack_type}")
+            await self._execute(raw_events, attack_type, profile)
+            log.info(f"✅ Simulation {attack_type} completed successfully")
+        except Exception as e:
+            log.error(f"❌ Simulation {attack_type} failed: {e}")
+        finally:
+            self.is_running = False
+            self.current_attack = None
+            log.info(f"🏁 Simulation engine reset to idle")
 
     async def run_demo(self):
         """Runs a sequence of attacks for demonstration."""
         attacks = ["brute_force", "c2_beacon", "data_exfiltration"]
         self.is_running = True
         self.is_paused = False
+        self.progress = 0.0
         self._stop_event.clear()
         self._pause_event.set()
 
-        for i, at in enumerate(attacks):
-            if self._stop_event.is_set():
-                break
-            self.current_attack = f"Demo: {at.replace('_', ' ').title()}"
-            gen = self.generators.get(at)
-            profile = ATTACK_PROFILES.get(at, {})
-            raw_events = gen.generate_events(30) # 30s per stage
-            await self._execute(raw_events, at, profile, progress_offset=i/len(attacks)*100, progress_scale=1/len(attacks))
-        
-        self.is_running = False
+        log.info("🎬 Starting Multi-Stage Demo Simulation")
+
+        try:
+            for i, at in enumerate(attacks):
+                if self._stop_event.is_set():
+                    break
+                self.current_attack = f"Demo: {at.replace('_', ' ').title()}"
+                log.info(f"🎭 Demo Phase {i+1}: {at}")
+                
+                gen = self.generators.get(at)
+                profile = ATTACK_PROFILES.get(at, {})
+                raw_events = gen.generate_events(30) # 30s per stage
+                await self._execute(raw_events, at, profile, progress_offset=i/len(attacks)*100, progress_scale=1/len(attacks))
+            
+            log.info("✨ Demo Simulation completed")
+        except Exception as e:
+            log.error(f"💥 Demo Simulation failed: {e}")
+        finally:
+            self.is_running = False
+            self.current_attack = None
+            log.info("🏁 Simulation engine reset to idle")
 
     async def _execute(self, raw_events, attack_type, profile, progress_offset=0.0, progress_scale=1.0):
         total = len(raw_events)
