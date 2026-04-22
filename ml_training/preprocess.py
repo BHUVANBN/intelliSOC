@@ -10,6 +10,7 @@ import json
 import logging
 import numpy as np
 import pandas as pd
+import argparse
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.model_selection import train_test_split
 from imblearn.over_sampling import SMOTE
@@ -94,17 +95,28 @@ CLASS_ENCODE = {
 }
 
 
-def load_raw_files() -> pd.DataFrame:
+def load_raw_files(synthetic_only: bool = False) -> pd.DataFrame:
     """Load all CICIDS CSVs, rename columns, apply label mapping."""
     frames = []
-    csv_files = [f for f in os.listdir(RAW_DIR) if f.endswith(".csv")]
+    
+    if synthetic_only:
+        csv_files = ["synthetic_demo_data.csv"]
+        log.info("Mode: Synthetic-Only (Filtering for synthetic_demo_data.csv)")
+    else:
+        csv_files = [f for f in os.listdir(RAW_DIR) if f.endswith(".csv")]
 
     if not csv_files:
-        log.error(f"No CSV files found in {RAW_DIR}. Run download_dataset.py first.")
+        log.error(f"No CSV files found in {RAW_DIR}. Run download_dataset.py or generate_synthetic_data.py first.")
         sys.exit(1)
 
     for fname in sorted(csv_files):
         path = os.path.join(RAW_DIR, fname)
+        if not os.path.exists(path):
+            if synthetic_only:
+                log.error(f"Synthetic data file {fname} not found. Run generate_synthetic_data.py first.")
+                sys.exit(1)
+            continue
+            
         log.info(f"Loading: {fname}")
         try:
             df = pd.read_csv(path, low_memory=False, encoding="utf-8")
@@ -190,10 +202,14 @@ def apply_smote(X: np.ndarray, y: np.ndarray) -> tuple:
 
 
 def main():
+    parser = argparse.ArgumentParser(description="intelli-SOC Preprocessing Pipeline")
+    parser.add_argument("--synthetic", action="store_true", help="Process only synthetic_demo_data.csv")
+    args = parser.parse_args()
+
     log.info("═══ intelli-SOC Preprocessing Pipeline ═══")
 
     # 1. Load
-    df = load_raw_files()
+    df = load_raw_files(synthetic_only=args.synthetic)
 
     # 2. Clean
     df = clean(df)
