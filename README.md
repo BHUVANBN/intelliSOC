@@ -34,7 +34,7 @@ intelli-SOC operates on a distributed containerized architecture designed for sc
 │  └──────────────┘               └────────────┬─────────────┘│
 │                                              │              │
 │  ┌─────────────┐                ┌────────────▼─────────────┐│
-│  │   Redis 7   │ ◄──────────── │   Correlator + Playbook  ││
+│  │   Redis 7   │ ◄────────────  │   Correlator + Playbook  ││
 │  │  172.25.0.10│                │   ML Inference (XGBoost) ││
 │  └─────────────┘                └──────────────────────────┘│
 └─────────────────────────────────────────────────────────────┘
